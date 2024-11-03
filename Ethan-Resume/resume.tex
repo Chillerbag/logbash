@@ -1,0 +1,220 @@
+%-------------------------
+% Resume in Latex
+% Author : Ethan Hawkins
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\begin{center}
+    \textbf{\Huge \scshape Ethan Hawkins}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {University of Melbourne}{Melbourne, VIC}
+      {BSc, Computing and Software Systems}{Feb. 2022 -- Dec 2024}
+      \resumeItem{\textbf{Courses}{: Algorithms and Data Structures, Object Oriented Software Development, Database Systems, Computer Systems, Software Modelling and Design, Quantum Computing, Machine Learning, Linear Algebra, Declarative Programming.}}
+  \resumeSubHeadingListEnd
+
+
+%-----------Extracurriculars-----------
+\section{Work Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Altis Consulting - Snowflake, SQL, Python}{Jul. 2023 -- Present}
+      {Technology Intern}{Jul 2023 - Oct 2024}
+      \resumeItemListStart
+        \resumeItem{Developed and integrated 5+ ETL Pipelines for a top client}
+        \resumeItem{Streamlined the DevOps process with Python tools to automate compliance checking for code standards, saving 2+ hours of time per deployment cycle.}
+        \resumeItem{Engineered complex JavaScript stored procedures in Snowflake to ensure consistency of code across environments, with 100\% code coverage.}
+      \resumeItemListEnd
+    {\textit{\small{Consultant\hfill Oct. 2024 - Present}}}
+    \vspace{-7pt}
+    \resumeItemListStart
+        \resumeItem{Skipped Graduate role due to high level of responsibility managing the integration of 3+ complex, real-time SQL based systems in an ASX top 20 company.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+
+%-----------Experience-----------
+\section{Projects}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Sprout Momentum Master App | TypeScript, Redis, Auth0, AWS}{July 2024 -- Nov 2024}
+      {SCRUM Master and Full-Stack Developer}{}
+      \resumeItemListStart
+        \resumeItem{Developing a productivity app to help professionals take control of their growth through self-reflection.}
+        \resumeItem{Driving team collaboration in a group of 5 using SCRUM methodology, executing 3-week sprints, and maintaining detailed documentation on Confluence.}
+        \resumeItem{Implementing and managing CI/CD pipelines via Vercel and Gitlab for efficient deployment and integration.}
+        \resumeItem{Developed and implemented comprehensive unit tests for backend APIs using Jest, ensuring 95\% code coverage and validating core features including user authentication, data entry, and retrieval.}
+      \resumeItemListEnd
+      
+    \resumeSubheading
+      {Personal Portfolio Website | JavaScript, React, HTML, CSS, ThreeJS, Node.js}{2024}
+      {Personal Project}{}
+      \resumeItemListStart
+        \resumeItem{Developed a full frontend website with interactive 3d features to showcase my work.}
+        \resumeItem{Learnt vital JavaScript skills on cutting edge frameworks.}
+        \resumeItemListEnd
+        
+    \resumeSubheading
+      {JSON Parser| Haskell, Data Structures, Dynamic Programming}{2024}
+      {Personal Project}{}
+      \resumeItemListStart
+        \resumeItem{Wrote a JSON parser using vital computer science concepts in Haskell.}
+        \resumeItem{Tested my functional programming skills and strengthened my use of recursion.}
+        \resumeItem{Non-Trivial use of data structures and algorithms, using trees, stacks, and grammars.}
+        \resumeItemListEnd
+
+        \resumeSubheading
+      {IMAP Mail Client| Rust, TCP, UDP, IPs}{2024}
+      {University Project}{}
+      \resumeItemListStart
+        \resumeItem{Designed and implemented a fully featured IMAP mail client in Rust using networking libraries.}
+        \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+\section{Extracurricular}
+    \resumeSubHeadingListStart
+      \resumeSubheading
+      {Code Club Australia}{Jan 2023-Present}
+      {}{}
+      \resumeItemListStart
+      \vspace{-4mm}
+        \resumeItem{Volunteered time weekly, to teach primary school aged children how to code in Python.}
+      \resumeItemListEnd
+    \resumeSubHeadingListEnd
+
+%-----------Courses-----------
+
+%-----------Skill and Interests-----------
+\section{Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+    \vspace{1mm}
+     \textbf{Languages}{: C, Java, Python, JavaScript, SQL, TypeScript, Dart, Haskell, Prolog, Rust, C\#.} \\
+     \vspace{1mm}
+     \textbf{Developer Tools}{: Git, VS Code, PyCharm, IntelliJ, MySQL, Jupyter, AndroidStudio, Flutter, Node.js, Snowflake, NeoVim, Azure DevOps, SQL Management Studio.} \\
+     \textbf{Project Management \& Collaboration Tools}{: Slack, Jira, Confluence, Agile Methodology.} \\
+     \vspace{1mm}
+
+    }}
+ \end{itemize}
+ \begin{center}
+    
+\small +61403057867 $|$ 
+\href{mailto:ADD EMAIL HERE@x.com}{\underline{ethanwhawkins@gmail.com}} $|$
+\href{ADD LINKEDIN PAGE HERE}{\underline{linkedin.com/in/ethan-hawkins-24486a244}} 
+$|$
+\href{ADD LINKEDIN PAGE HERE}{\underline{https://www.computer-games.xyz/}} 
+
+\end{center}
+
+
+\end{document}
