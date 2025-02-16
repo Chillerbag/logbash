@@ -1,0 +1,150 @@
+#!/bin/bash
+
+# TODOS:
+# 1) add more error handling
+# 2) make functions reference local vars, not $1 etc. 
+# 3) add function to swap records
+# 4) add functionality to list all logs.
+# 5) fix rendering of the table
+
+new_log() {
+  DATA_DIR="$HOME/.local/share/bashlog/${1}.csv"
+  mkdir -p "$(dirname "${DATA_DIR}")"
+
+  if [[ -f "${DATA_DIR}" ]]; then
+    echo "Error, log with that name already exists at: ${DATA_DIR}"
+    exit 1
+  fi
+
+  touch "${DATA_DIR}" || {
+    echo "Error, could not create log at ${DATA_DIR}"
+    exit 1
+  }
+
+  echo "Log made successfully at ${DATA_DIR}"
+}
+
+read_log() {
+  DATA_DIR="$HOME/.local/share/bashlog/${1}.csv"
+
+  if [[ ! -f "${DATA_DIR}" ]]; then
+    echo "Error, there is no log with that name: ${DATA_DIR}"
+    exit 1
+  fi
+
+  # this doesnt work the way I hoped
+  len_col=${#1}
+  print_len=$((len_col * 2))
+  printf -v dash_sep '%*s' "$print_len" | tr ' ' '-'
+
+  echo "+${dash_sep}+"
+  echo "${1}"
+  echo "+${dash_sep}+"
+
+  nl -s ') ' "${DATA_DIR}" | while read -r line; do
+    echo "${line}"
+    echo "+${dash_sep}+"
+  done
+}
+
+update_log() {
+  DATA_DIR="$HOME/.local/share/bashlog/${1}.csv"
+
+  if [[ ! -f "${DATA_DIR}" ]]; then
+    echo "Error, there is no log with that name: ${DATA_DIR}"
+    exit 1
+  fi
+
+  sed -i -e '$a\' "${DATA_DIR}"
+  
+  first_line=$(head -n 1 "${DATA_DIR}")
+  echo "Completing ${first_line}"
+  read -p "Continue? (y/n) " confirm
+
+  if [[ "${confirm}" == "y" ]]; then
+    sed -i '1d' "${DATA_DIR}"
+    echo "Completed!" 
+  else
+    echo "Cancelled"
+  fi 
+}
+
+delete_log() {
+  DATA_DIR="$HOME/.local/share/bashlog/${1}.csv"
+
+  if [[ ! -f "${DATA_DIR}" ]]; then
+    echo "Error, there is no log with that name: ${DATA_DIR}"
+    exit 1
+  else
+    rm "${DATA_DIR}"
+    echo "Log has been successfully deleted."
+  fi
+
+}
+
+add_to_log() {
+    LOG="${1}"
+    DATA_DIR="$HOME/.local/share/bashlog/${LOG}.csv"
+    NEW_ENTRY="${2}" 
+
+    if [[ ! -f "${DATA_DIR}" ]]; then
+      echo "Error, there is no log with that name: ${DATA_DIR}"
+      exit 1
+    fi 
+
+    if [[ -s "${DATA_DIR}" ]] && [[ $(tail -c1 "${DATA_DIR}" | wc -l) -eq 0 ]]; then
+        echo >> "${DATA_DIR}"
+    fi
+    
+    echo "${NEW_ENTRY}" >> "${DATA_DIR}" 
+
+    echo "${NEW_ENTRY} has been added to log ${LOG}"
+
+}
+
+main() {
+  while getopts "n:r:u:a:d:h" flag; do
+    case $flag in
+      n)
+        log="${OPTARG}"
+        new_log "${log}"
+        # TODO: Should return and evaluate a code here. google standard
+        ;;
+      r)
+        log_to_read="${OPTARG}"
+        read_log "${log_to_read}"
+        ;;
+      u)
+        log_to_update="${OPTARG}"
+        update_log "${log_to_update}"
+        read_log "${log_to_update}"
+
+        ;;
+      a)
+        log_to_add="${OPTARG}"
+        log_to_update="${!OPTIND}"
+        # maybe shift here to remove positional arg. 
+        add_to_log "${log_to_add}" "${log_to_update}"
+        read_log "${log_to_add}"
+        ;;
+      d)
+        log_to_delete="${OPTARG}"
+        delete_log "${log_to_delete}"
+        ;;
+      h)
+        echo "Usage: ${0} [-n new_log] [-r read_log] [-u update_log] [-a add_to_log log_to_add_to] [-d delete_log] [-h]"
+        ;;
+      ?)
+        echo "Invalid option: -${OPTARG}"
+        exit 1
+        ;;
+    esac
+  done 
+}
+
+main "$@" 
+      
+      
+    
+
+    
