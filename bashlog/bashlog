@@ -109,8 +109,33 @@ add_to_log() {
 
 }
 
+swap_records() {
+  local log="${1}"
+  local l1="${2}"
+  local l2="${3}"
+
+  DIR="$HOME/.local/share/bashlog/${log}_bashlog.csv"
+  if [[ ! -f "${DIR}" ]]; then
+    echo "Error, there is no log with that name: ${DIR}"
+    exit 1
+  fi 
+
+  # TODO: error handle reading these lines 
+  line1_content=$(sed -n "${l1}p" "$DIR") # p = print -n = no print to console
+  line2_content=$(sed -n "${l2}p" "$DIR")
+
+  # swap the lines 
+  sed -i.bak \
+    -e "${l1}s/.*/${line2_content}/" \
+    -e "${l2}s/.*/${line1_content}/" \
+    "${DIR}"
+
+  rm "${DIR}.bak"
+  echo "Swap has completed successfully."
+}
+
 main() {
-  while getopts "n:r:u:a:d:h" flag; do
+  while getopts "n:r:u:a:d:s:h" flag; do
     case $flag in
       n)
         log="${OPTARG}"
@@ -138,8 +163,17 @@ main() {
         log_to_delete="${OPTARG}"
         delete_log "${log_to_delete}"
         ;;
+      s) 
+        log_to_swap="${OPTARG}"
+        l1="${!OPTIND}"
+        # is this good syntax? ask online. 
+        OPTIND=$((OPTIND + 1))
+        l2="${!OPTIND}"
+        swap_records "${log_to_swap}" "${l1}" "${l2}"
+        read_log "${log_to_swap}"
+        ;;
       h)
-        echo "Usage: ${0} [-n Maker a new log] [-r Read a log] [-u Log to update] [-a (Log to add to) (New item)] [-d Delete a log] [-l List all logs] [-h]"
+        echo "Usage: ${0} [-n Maker a new log] [-r Read a log] [-u Log to update] [-a (Log to add to) (New item)] [-d Delete a log] [-l List all logs] [-s log line1 line2] [-h]"
         ;;
       ?)
         echo "Invalid option: -${OPTARG}"
