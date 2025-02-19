@@ -3,9 +3,9 @@
 # TODOS:
 # 1) add more error handling
 # 2) make functions reference local vars, not $1 etc. 
-# 3) add function to swap records
-# 4) add functionality to list all logs.
-# make pretty!
+# 5) variablr names are all over the place. fix.
+# make pretty! (code wise)
+
 
 new_log() {
   DATA_DIR="$HOME/.local/share/bashlog/${1}_bashlog.csv"
@@ -32,6 +32,7 @@ read_log() {
     exit 1
   fi
 
+  # there has to be a better way than this. 
   width=$(tput cols)
   length=$((${#1} + 2))
   number=$(( ($RANDOM % 7) + 1 ))
@@ -134,8 +135,34 @@ swap_records() {
   echo "Swap has completed successfully."
 }
 
+print_logs() {
+  local dir="$HOME/.local/share/bashlog/"
+  local title="Logs"
+  width=$(tput cols)
+  #yourfilenames=$(ls ${dir}*_bashlog.csv) # add to notes - command variable substituion
+  #echo "${yourfilenames}"
+  length=$((${#title} + 2))
+  number=$(( ($RANDOM % 7) + 1 ))
+  border=$(printf =%"${length}"s= | tr " " "=")
+  tput setaf ${number}
+  tput hpa $(((width / 2) - (length / 2)))
+  echo "${border}"
+  tput hpa $(((width / 2) - (length / 2)))
+  echo "= ${title} = "
+  tput hpa $(((width / 2) - (length / 2)))
+  echo "${border}"
+  tput setaf 9
+  for file in ${dir}*_bashlog.csv; do
+    tput hpa $(((width / 2) - (length / 2)))
+    tput setaf ${number}
+    echo -n "| "
+    tput setaf 9
+    echo "$(basename "${file}" _bashlog.csv)" # add to notes
+  done
+}
+
 main() {
-  while getopts "n:r:u:a:d:s:h" flag; do
+  while getopts "n:r:u:a:d:s:hl" flag; do
     case $flag in
       n)
         log="${OPTARG}"
@@ -162,6 +189,9 @@ main() {
       d)
         log_to_delete="${OPTARG}"
         delete_log "${log_to_delete}"
+        ;;
+      l) 
+        print_logs
         ;;
       s) 
         log_to_swap="${OPTARG}"
