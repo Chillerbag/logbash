@@ -3,7 +3,8 @@
 # Create simple backlogs designed to be completed linearly. 
 #
 # Author: Ethan Hawkins
-# Last modified: 2025/02/21 
+# Last modified: 2025/02/22
+# Version: 1.00
 #
 # Flags:
 #   -n [logname] - Add a new log.
