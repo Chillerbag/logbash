@@ -1,0 +1,324 @@
+#!/bin/bash
+#
+# Create simple backlogs designed to be completed linearly. 
+#
+# Author: Ethan Hawkins
+# Last modified: 2025/02/21 
+#
+# Flags:
+#   -n [logname] - Add a new log.
+#   -r [logname] - Reads an existing log.
+#   -u [logname] - Updates a log.
+#   -d [logname] - deletes a log.
+#   -a [logname] [entry] - Adds a new entry to a log.
+#   -s [logname] [i1] [i2] - Swaps two entries by index.
+#   -l - lists all existing logs.
+#   -h - Help.
+#   
+# This script adheres to the following style guide: 
+#   https://google.github.io/styleguide/shellguide.html
+
+# ------------------------- Constants ----------------------
+
+readonly BASHLOG_PATH="$HOME/.local/share/bashlog"
+
+# ------------------------- Helpers ------------------------
+
+err() {
+  echo "Error: $*" >&2
+}
+
+print_header() {
+  local title="${1}"
+
+  # non-locals - used in other functions.
+  width=$(tput cols)
+  length=$((${#title} + 2))
+  number=$(( ($RANDOM % 7) + 1 ))
+  border=$(printf =%"${length}"s= | tr " " "=")
+
+  tput setaf ${number}
+  tput hpa $(((width / 2) - (length / 2)))
+  echo "${border}"
+  tput hpa $(((width / 2) - (length / 2)))
+  echo "= ${title} = "
+  tput hpa $(((width / 2) - (length / 2)))
+  echo "${border}"
+  tput setaf 9
+}
+
+# ------------------ Flag Functions -------------------------
+
+#######################################
+# Create a new log. Called with -n [logname]
+# Arguments:
+#   $1 - Log to add
+# Outputs:
+# STDOUT - returns 0 and msg: "Log made successfully"
+# STDERR - returns 1 and error message from err(), then exits.
+#######################################
+new_log() {
+  local log="${1}"
+  local directory="${BASHLOG_PATH}/${log}_bashlog.csv"
+
+  mkdir -p "$(dirname "${directory}")" # don't throw error if doesn't exist
+
+  if [[ -f "${directory}" ]]; then
+    err "log with that name already exists at: ${directory}"
+    exit 1
+  fi
+
+  touch "${directory}" || {
+    err "Error, could not create log at ${directory}"
+    exit 1
+  }
+
+  echo "Log made successfully at ${directory}"
+}
+
+#######################################
+# reads a log. called with -r [logname]
+# Arguments:
+#   $1 - Log to read
+# Outputs:
+# STDOUT - returns 0 and pretty-printed log.
+# STDERR - returns 1 and error message from err(), then exits.
+#######################################
+read_log() {
+  local log="${1}"
+  local directory="${BASHLOG_PATH}/${log}_bashlog.csv"
+
+  if [[ ! -f "${directory}" ]]; then
+    echo "Error, there is no log with that name: ${directory}"
+    exit 1
+  fi
+
+  print_header "${log}"
+
+  # write numbered lines with nl. -s sets seperator.
+  # pipes it into the while loop, as if its the first executed line.
+  nl -s ') ' "${directory}" | while read -r line; do
+    tput hpa $(((width / 2) - (length / 2)))
+    tput setaf ${number}
+    echo -n "| "
+    tput setaf 9
+    echo "${line}"
+  done
+}
+
+#######################################
+# updates a log (removes next element at index 0). called with -u [logname]
+# Arguments:
+#   $1 - Log to update
+# Outputs:
+# STDOUT - returns 0 and pretty-printed log.
+# STDERR - returns 1 and error message from err(), then exits.
+#######################################
+update_log() {
+  local directory="${BASHLOG_PATH}/${1}_bashlog.csv"
+
+  if [[ ! -f "${directory}" ]]; then
+    echo "Error, there is no log with that name: ${directory}"
+    exit 1
+  fi
+
+  sed -i -e '$a\' "${directory}"
+  
+  first_line=$(head -n 1 "${directory}")
+  echo "Completing ${first_line}"
+  read -p "Continue? (y/n) " confirm
+
+  if [[ "${confirm}" == "y" ]]; then
+    sed -i '1d' "${directory}"
+    echo "Completed!" 
+  else
+    echo "Cancelled"
+  fi 
+}
+
+#######################################
+# deletes a log. called with -d [logname]
+# Arguments:
+#   $1 - Log to delete
+# Outputs:
+# STDOUT - returns 0 and deletion msg.
+# STDERR - returns 1 and error message from err(), then exits.
+#######################################
+delete_log() {
+  local directory="${BASHLOG_PATH}/${1}_bashlog.csv"
+
+  if [[ ! -f "${directory}" ]]; then
+    echo "Error, there is no log with that name: ${directory}"
+    exit 1
+  else
+    rm "${directory}"
+    echo "Log has been successfully deleted."
+  fi
+
+}
+
+#######################################
+# adds an entry to a log. called with -a [logname] [entryname]
+# Arguments:
+#   $1 - Log to add to
+#   $2 - New entry to that log
+# Outputs:
+# STDOUT - returns 0 and success message
+# STDERR - returns 1 and error message from err(), then exits.
+#######################################
+add_to_log() {
+    local log="${1}"
+    local new_entry="${2}" 
+    local directory="${BASHLOG_PATH}/${log}_bashlog.csv"
+
+    if [[ ! -f "${directory}" ]]; then
+      echo "Error, there is no log with that name: ${directory}"
+      exit 1
+    fi 
+
+    if [[ -s "${directory}" ]]; then  # If file exists and is not empty
+        sed -i -e '$a\' "${directory}"  # Add newline to end if needed
+    fi
+    
+    echo "${new_entry}" >> "${directory}" 
+    echo "${new_entry} has been added to log ${log}"
+
+}
+
+#######################################
+# swaps two entries to a log. called with -s [logname] [index1] [index2]
+# Arguments:
+#   $1 - Log to use
+#   $2 - index 1 to swap
+#   $3 - index 2 to swap
+# Outputs:
+# STDOUT - returns 0 and success message
+# STDERR - returns 1 and error message from err(), then exits.
+#######################################
+swap_records() {
+  local log="${1}"
+  local line_1="${2}"
+  local line_2="${3}"
+  local directory="${BASHLOG_PATH}/${log}_bashlog.csv"
+  # word count func -l = lines
+  local total_lines=$(wc -l < "${directory}")
+
+  if [[ ! -f "${directory}" ]]; then
+    echo "Error, there is no log with that name: ${directory}"
+    exit 1
+  fi 
+
+  # Check if inputs are numbers
+  if ! [[ "${line_1}" =~ ^[0-9]+$ ]] || ! [[ "${line_2}" =~ ^[0-9]+$ ]]; then
+    err "Line numbers must be positive integers"
+    exit 1
+  fi
+
+  # Check if line numbers are within bounds
+  if [[ "${line_1}" -gt "${total_lines}" ]] \
+      || [[ "${line_2}" -gt "${total_lines}" ]]; then
+    err "Line numbers must be within range (1-${total_lines})"
+    exit 1
+  fi
+
+  # Try to read the lines with error handling p=print -n=no console out
+  line1_content=$(sed -n "${line_1}p" "${directory}") || {
+    err "Failed to read line ${line_1}"
+    exit 1
+  }
+
+  line2_content=$(sed -n "${line_2}p" "${directory}") || {
+      err "Failed to read line ${line_2}"
+      exit 1
+  }
+
+  # Check if we got empty content when we shouldn't have
+  if [[ -z "${line1_content}" ]] || [[ -z "${line2_content}" ]]; then
+    err "Failed to read one or both lines"
+    exit 1
+  fi
+
+  # swap the lines 
+  sed -i.bak \
+    -e "${line_1}s/.*/${line2_content}/" \
+    -e "${line_2}s/.*/${line1_content}/" \
+    "${directory}"
+
+  rm "${directory}.bak"
+  echo "Swap has completed successfully."
+}
+
+#######################################
+# prints all logs that exist. Called with -l
+# Arguments:
+#   None
+# Outputs:
+# STDOUT - returns 0 and all logs
+# STDERR - returns 1 and error message from err(), then exits.
+#######################################
+print_logs() {
+  local directory="${BASHLOG_PATH}/"
+  print_header "Logs"
+
+  for file in ${directory}*_bashlog.csv; do
+    tput hpa $(((width / 2) - (length / 2)))
+    tput setaf ${number}
+    echo -n "| "
+    tput setaf 9
+    echo "$(basename "${file}" _bashlog.csv)"
+  done
+}
+
+# ------------------ Main Function -------------------------
+
+main() {
+  while getopts "n:r:u:a:d:s:hl" flag; do
+    case $flag in
+      n)
+        log="${OPTARG}"
+        new_log "${log}"
+        ;;
+      r)
+        log_to_read="${OPTARG}"
+        read_log "${log_to_read}"
+        ;;
+      u)
+        log_to_update="${OPTARG}"
+        update_log "${log_to_update}"
+        read_log "${log_to_update}"
+        ;;
+      a)
+        log_to_add="${OPTARG}"
+        log_to_update="${!OPTIND}"
+        add_to_log "${log_to_add}" "${log_to_update}"
+        read_log "${log_to_add}"
+        ;;
+      d)
+        log_to_delete="${OPTARG}"
+        delete_log "${log_to_delete}"
+        ;;
+      l) 
+        print_logs
+        ;;
+      s) 
+        log_to_swap="${OPTARG}"
+        line_1="${!OPTIND}"
+        OPTIND=$((OPTIND + 1))
+        line_2="${!OPTIND}"
+        swap_records "${log_to_swap}" "${line_1}" "${line_2}"
+        read_log "${log_to_swap}"
+        ;;
+      h)
+        echo "Usage: ${0} [-n Maker a new log] [-r Read a log] \
+          [-u Log to update] [-a (Log to add to) (New item)] [-d Delete a log] \
+           [-l List all logs] [-s log line1 line2] [-h]"
+        ;;
+      ?)
+        echo "Invalid option: -${OPTARG}"
+        exit 1
+        ;;
+    esac
+  done 
+}
+
+main "$@" 
