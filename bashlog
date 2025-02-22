@@ -309,9 +309,9 @@ main() {
         read_log "${log_to_swap}"
         ;;
       h)
-        echo "Usage: ${0} [-n Maker a new log] [-r Read a log] \
-          [-u Log to update] [-a (Log to add to) (New item)] [-d Delete a log] \
-           [-l List all logs] [-s log line1 line2] [-h]"
+         echo "Usage: ${0} [-n new_log] [-r log_to_read] \
+          [-u log_to_update] [-a log_to_add_to new_entry] [-d log_to_delete] \
+          [-s log swap_line1 swap_line2] [-l] [-h]"
         ;;
       ?)
         echo "Invalid option: -${OPTARG}"
